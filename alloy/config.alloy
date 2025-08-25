@@ -17,7 +17,10 @@ otelcol.receiver.otlp "default" {
 
   output {
     metrics = [otelcol.processor.batch.default.input]
-    traces  = [otelcol.processor.batch.default.input]
+    traces  = [
+      otelcol.processor.batch.default.input,
+      otelcol.connector.host_info.default.input,
+    ]
     logs    = [otelcol.processor.batch.default.input]
   }
 }
@@ -39,5 +42,16 @@ otelcol.exporter.otlphttp "default" {
   client {
     endpoint = sys.env("GRAFANA_CLOUD_OTLP_ENDPOINT")
     auth     = otelcol.auth.basic.default.handler
+  }
+}
+
+// Enable App Observability
+// See https://grafana.com/docs/grafana-cloud/monitor-applications/application-observability/pricing/#grafana-alloy
+otelcol.connector.host_info "default" {
+  // https://grafana.com/docs/alloy/latest/reference/components/otelcol.connector.host_info/
+  host_identifiers = ["host.name"]
+
+  output {
+    metrics = [otelcol.processor.batch.default.input]
   }
 }
