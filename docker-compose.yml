@@ -1,0 +1,47 @@
+services:
+
+  alloy:
+    image: grafana/alloy:latest
+    ports:
+      - "12345:12345"               # alloy UI
+    environment:
+      - GRAFANA_CLOUD_OTLP_USER     # from .env
+      - GRAFANA_CLOUD_OTLP_TOKEN    # from .env
+      - GRAFANA_CLOUD_OTLP_ENDPOINT # from .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./alloy/config.alloy:/etc/alloy/config.alloy
+      - alloy-data:/var/lib/alloy/data
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+
+  airlines:
+    build:
+      context: ./airlines
+    ports:
+      - "8080:8080"
+    environment:
+      - OTEL_SERVICE_NAME=airlines
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=airlines,deployment.environment=local
+      # Debug settings
+      - OTEL_LOG_LEVEL=debug
+      - OTEL_JAVAAGENT_DEBUG=true
+      # Spring logging
+      # - LOGGING_LEVEL_ROOT=DEBUG
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  alloy-data:
