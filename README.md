@@ -135,7 +135,7 @@ From the `scripts/` directory:
   ./airlines-loadgen.sh -e 0.25 -d 3600
   ```
 
-# Visialize generated telemetry in Grafana Cloud
+# Visualize generated telemetry in Grafana Cloud
 
 - Head to your Grafana instance [Drilldown page](https://grafana.com/docs/grafana/latest/explore/simplified-exploration/) to view generated metrics, logs and traces
 image.png
